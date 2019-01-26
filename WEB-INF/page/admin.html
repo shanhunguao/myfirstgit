@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>layout 后台大布局 - Layui</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../icheck/minimal/red.css">
+
+</head>
+<body class="layui-layout-body">
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px;">
+        <fieldset class="layui-elem-field">
+            <legend>用户管理 - 用户列表</legend>
+            <div class="layui-field-box">
+              <form class="layui-form" action="">
+                <div class="layui-form-item" style="text-align:center;">
+                  <div class="layui-inline">
+                    <div class="layui-input-inline">
+                      <input autocomplete="off" class="layui-input" placeholder="请输入名称" type="text" name="name" value="">
+                    </div>
+                  </div>
+                  <div class="layui-inline" style="text-align:left;">
+                    <div class="layui-input-inline">
+                      <button class="layui-btn"><i class="layui-icon">&#xe615;</i>查询</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <hr>
+                 <div class="layui-btn-group">
+                  <button class="layui-btn layui-btn-xs layui-btn-normal dw-dailog" dw-url="create.html" dw-title="新增用户" dw-width="100%" dw-height="100%">
+                      <i class="layui-icon">&#xe654;</i>新增
+                  </button>
+                  <button class="layui-btn layui-btn-xs layui-btn-danger dw-batch-delete" id="delete"  dw-url="delete.html">
+                      <i class="layui-icon">&#xe640;</i>删除
+                  </button>
+                     <button class="layui-btn layui-btn layui-btn-xs" onclick="selectRole()">
+                         修改
+                     </button>
+              </div>
+              <hr>
+              <table class="layui-table">
+                  <colgroup>
+                      <col width="150">
+                      <col width="150">
+                      <col width="200">
+                      <col>
+                      <col>
+                  </colgroup>
+                  <thead>
+                      <tr>
+                      <th class="selectAll"><input type="checkbox" value="0"></th>
+                          <th>ID</th>
+                      <th>用户名</th>
+                      <th>密码</th>
+                      <th>账号余额</th>
+                      </tr>
+                  </thead>
+                  <tbody id="tbodyId">
+                  </tbody>
+              </table>
+            </div>
+
+            <!--修改弹出框-->
+            <div class="layui-field-box" id="popSearchRoleTest" style="display:none;">
+                <form class=\"layui-form\" action=\"/page/id/name/password/count\">
+                    <div class=\"layui-form-item\">
+                        <label class=\"layui-form-label\">ID</label>
+                        <div class=\"layui-input-inline\" id=\"ids\">
+                            <input type=\"text\" name=\"id\" class=\"layui-input\">
+                        </div>
+                    </div>
+                    <div class=\"layui-form-item\">
+                        <label class=\"layui-form-label\">用户名</label>
+                        <div class=\"layui-input-inline\">
+                            <input type=\"text\" name=\"name\" class=\"layui-input\">
+                        </div>
+                    </div>
+
+                    <div class=\"layui-form-item\">
+                        <label class=\"layui-form-label\">密码/机号</label>
+                        <div class=\"layui-input-inline\">
+                            <input type=\"text\" name=\"password\" class=\"layui-input\" id=\"password\" value='data.password'>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class=\"layui-form-label\">账户余额</label>
+                        <div class=\"layui-input-inline\">
+                            <input type=\"text\" name=\"count\" class=\"layui-input\" id=\"count\">
+                        </div>
+                    </div>
+
+                    <div class=\"layui-form-item\">
+                        <div class=\"layui-input-block\">
+                            <button class=\"layui-btn\" type=\"submit\">立即提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </fieldset>
+    </div>
+  </div>
+
+</div>
+<script type="text/javascript" src="../../javascript/jquery.min.js"></script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../icheck/icheck.js"></script>
+<script type="text/javascript" src="../../javascript/dw.js"></script>
+  <script type="text/javascript" src="../../javascript/dw_form_submit.js"></script>
+<script type="text/javascript">
+    $(function () {
+        //页面加载完成,查询数据库,返回数据,显示在页面中
+        doGetObjects();
+    })
+
+    function doGetObjects(){
+        $.ajax({
+            type: "GET",
+        dataType: "JSON",
+            url: "http://localhost/ouser/findAll",
+            success: function(data) {
+                doSetTableBodyRows(data);
+            }
+
+    });
+    }
+
+    //通过服务端返回的数据初始化页面
+   function doSetTableBodyRows(data){
+        //1.获取tbody对象，并清空内容
+        var tBody=$("#tbodyId");
+        tBody.empty();
+        //2.迭代data内容将数据追加到tbody中
+        for(var i in data){
+            var tr=$("<tr></tr>");
+            tr.data("rowData",data[i]);
+            var tds=doCreateTds(data[i]);
+            tr.append(tds);
+            tBody.append(tr);
+        }
+    }
+
+    function doCreateTds(row){
+        console.log(row);
+        var tds=
+    "<td><input type=\"checkbox\" name=\"id\" value="+row.id+"></td>"+
+            "<td>"+row.id+"</td>"+
+            "<td>"+row.name+"</td>"+
+            "<td>"+row.password+"</td>"+
+            "<td>"+row.count+"</td>"
+        ;
+        return tds;
+    }
+
+    //删除
+    $("#delete").click(function () {
+        doDeleteObject();
+        //删除表格别选中表单中的一行
+        $("input[type=checkbox]:checked").parents("tr").remove();
+
+    })
+
+    function doDeleteObject() {
+        var id=[];
+        //获取所有被选中的元素的val值，并添加到数组中
+        var ids=$("input[type=checkbox]:checked").each(function () {
+            id.push($(this).val())
+        })
+
+        $.ajax({
+            url: "http://localhost/ouser/delete",
+            data:{"id":id},     //传递数组到后台，用string类型的数组接受
+            type: "POST",
+            traditional:true,
+            success: function(data) {
+                console.log(data);
+            }
+        });
+
+    }
+
+    //修改操作 弹出修改框
+    function selectRole(){
+                   layer.open({
+            //layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+            type:0,
+            title:"修改",
+            area: ['50%','50%'],
+            content:$("#popSearchRoleTest").html()
+        });
+        setinput(); //弹出修改框，反显数据失败，待修改
+
+    }
+
+    function setinput() {
+        var id= $("input[type=checkbox]:checked").val();
+        $.ajax({
+            url: "http://localhost/ouser/id",
+            data:{"id":id},     //传递数组到后台，用string类型的数组接受
+            type: "GET",
+            traditional:true
+
+        });
+    }
+
+</script>
+</body>
+</html>
