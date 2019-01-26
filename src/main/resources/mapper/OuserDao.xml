@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 设置为IUserDao接口方法提供sql语句配置 -->
+<mapper namespace="com.chatRobot.dao.OuserDao">
+
+    <select id="findAll" resultType="Ouser">
+        select * from ouser;
+    </select>
+
+    <insert id="insert" parameterType="com.chatRobot.model.Ouser">
+    insert into ouser values (#{id},#{name},#{password},#{count}
+    )
+    </insert>
+
+    <delete id="delete">
+        delete from ouser
+        where id in
+        <foreach collection="list"
+                 separator=","
+                 item="o"
+                 open="("
+                 close=")"
+>
+            #{o}
+        </foreach>
+
+    </delete>
+
+    <select id="findid" resultType="Ouser">
+        select * from ouser where id=#{id};
+    </select>
+
+
+</mapper>
